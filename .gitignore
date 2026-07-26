@@ -1,0 +1,35 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# env files -- API_URL and any secrets live here, never committed
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# editor/OS
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# vercel
+.vercel
+
+# typescript (kept in case type-checking is ever added)
+*.tsbuildinfo
+next-env.d.ts
