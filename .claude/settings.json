@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(npm run *)",
+      "Bash(cd /Users/biglogic/Desktop/project/university-portal && find . -maxdepth 2 -iname \"README*\" -not -path \"*/node_modules/*\"; echo \"---\"; cat university-portal-api/README.md 2>/dev/null | head -60)",
+      "Read(//Users/biglogic/Desktop/project/university-portal/**)",
+      "Bash(cd /Users/biglogic/Desktop/project/university-portal && grep -rn -i \"password\\\\|@university.edu\\\\|login\" university-portal-web-ssr/README.md university-portal-web/README.md 2>/dev/null | head -30; find . -path \"*/.claude/skills*\" -not -path \"*/node_modules/*\" 2>/dev/null)",
+      "Bash(npx eslint *)",
+      "Bash(grep -n \"Header\\\\|Meta\\\\|Clock\\\\|Date\\\\|Identity\\\\|Avatar\\\\|MoreVertical\\\\|Ellipsis\\\\|kebab\" /Users/biglogic/Desktop/project/university-portal/university-portal-web-ssr-old/components/dashboard/DashboardShell.js | head -80)",
+      "Read(//Users/biglogic/Desktop/project/university-portal/university-portal-web-ssr-old/components/dashboard/**)"
+    ]
+  }
+}

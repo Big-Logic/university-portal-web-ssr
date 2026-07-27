@@ -99,3 +99,23 @@ npm run build   # always run this before considering a change done
   Next.js 16's `/_not-found` prerender issue -- see that project's
   CLAUDE.md for the full explanation if you hit "Cannot read
   properties of undefined" during a build.
+
+## Sample content on the student dashboard
+
+`lib/sample-data.js` holds every piece of placeholder content on
+`/dashboard/home` and in the header popovers (checklist, term
+calendar, documents, notifications, GPA/credits, course progress).
+None of it comes from the API, because none of it has an endpoint yet.
+
+Two rules when working on this:
+
+- **Everything sourced from that file renders behind a visible
+  "Sample" badge.** Don't remove those badges while the data is still
+  fabricated -- a student seeing a made-up GPA presented as their own
+  record is the failure mode being guarded against.
+- **When a real endpoint lands, delete the matching export from
+  `lib/sample-data.js`** and fetch it in the Server Component
+  (`app/dashboard/home/page.js`) instead of adding a client-side
+  fetch. Note that `serverApiRequest` throws on a non-OK response,
+  which takes the whole page to the error boundary -- so don't wire up
+  an endpoint until it's actually deployed.
