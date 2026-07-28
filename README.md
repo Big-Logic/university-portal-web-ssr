@@ -17,8 +17,9 @@ npm run dev
 ```
 
 Visit http://localhost:3000 — `proxy.js` redirects you to `/login` if
-you're not signed in, `/dashboard` if you are, before any page code
-even runs.
+you're not signed in, or to your role's home page (`/admin/home`,
+`/faculty/home`, `/registrar/home`, `/student/home`) if you are, before
+any page code even runs.
 
 **Always run `npm run build` before considering a change done**, same
 as the sibling project.
@@ -29,7 +30,7 @@ as the sibling project.
 | --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------- |
 | Token storage               | Access token in memory, refresh token in `localStorage`  | Both in httpOnly cookies, never touch client JS                           |
 | Route protection            | `RequireRole`-style check after JS loads                 | `proxy.js`, before any page code runs                                     |
-| Data fetching               | Client `authFetch()`                                     | Server Components calling `serverApiRequest()`                            |
+| Data fetching               | Client `authFetch()`                                     | Server Components calling `apiRequest()` / `getCurrentUser()`             |
 | Browser → API               | Direct, cross-origin, needs CORS                         | Never — same-origin to this app's own Route Handlers, or server-to-server |
 | `API_URL` env var           | Must be `NEXT_PUBLIC_*` (reaches the client bundle)      | Plain server-only var (never reaches the client bundle)                   |
 | XSS token theft             | Readable via `document.cookie`-equivalent (localStorage) | Not directly readable — httpOnly                                          |
@@ -46,7 +47,7 @@ Next.js (this app)
   ├─ proxy.js              Route protection + proactive refresh (reads/writes cookies)
   ├─ app/api/auth/login     Route Handler: sets httpOnly cookies
   ├─ app/api/auth/logout    Route Handler: clears cookies, best-effort server-side revoke
-  └─ app/dashboard/page.js  Server Component: reads cookie, calls API server-to-server
+  └─ app/(dashboard)/{role}/...  Server Components: read cookie, call API server-to-server
         │
         ▼  server-to-server, no CORS involved
    Express API (Railway)

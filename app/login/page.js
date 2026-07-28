@@ -8,6 +8,7 @@ import { rt } from "@/lib/theme";
 import { motion } from "framer-motion";
 import { GraduationCap } from "lucide-react";
 import { loginSchema } from "@/lib/validation";
+import { homePathForRole } from "@/lib/navigation";
 import Button from "@/components/ui/Button";
 import Field from "@/components/ui/Field";
 import { Card, Alert } from "@/components/ui/primitives";
@@ -182,17 +183,18 @@ export default function LoginPage() {
         body: JSON.stringify(values),
       });
 
+      const data = await res.json().catch(() => null);
+
       if (!res.ok) {
-        const data = await res.json().catch(() => null);
         setFormError(data?.error?.message || "Sign-in failed. Check your credentials and try again.");
         return;
       }
 
       // Full navigation, not router.push -- the httpOnly cookie was
-      // just set on this response, and Middleware needs a fresh
-      // request to see it before /dashboard's server-side fetch will
+      // just set on this response, and Proxy needs a fresh request to
+      // see it before the destination page's server-side fetch will
       // succeed. A client-side route transition wouldn't guarantee that.
-      window.location.href = "/dashboard";
+      window.location.href = homePathForRole(data?.user?.role);
     } catch {
       setFormError("Couldn't reach the server. Check your connection and try again.");
     }

@@ -1,9 +1,9 @@
-import { serverApiRequest } from "@/lib/server-api";
+import { getCurrentUser } from "@/lib/server-api";
 import { assertRole } from "@/lib/navigation";
 import UsersView from "./UsersView";
 
 export default async function UsersPage() {
-  const user = await serverApiRequest("/api/v1/users/me");
+  const user = await getCurrentUser();
   assertRole(user, "admin");
 
   return <UsersView />;

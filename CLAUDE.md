@@ -18,12 +18,12 @@ primitives, form/validation conventions, animation, toasts).
   Handlers (`app/api/auth/login`, `app/api/auth/logout`) -- never
   exposed to client JS, unlike the sibling project's in-memory/
   localStorage approach.
-- **Data fetching for protected pages happens server-side.**
-  `app/dashboard/page.js` is a Server Component (no `"use client"`)
-  that calls the Express API directly, server-to-server, using
-  `lib/server-api.js`. There is no client-side `authFetch` equivalent
-  in this project -- if you're tempted to add one, that's a sign
-  you're accidentally reintroducing Version A's pattern here.
+- **Data fetching for protected pages happens server-side.** Every
+  page under the `(dashboard)` route group is a Server Component (no
+  `"use client"`) that calls the Express API directly, server-to-server,
+  using `lib/server-api.js`. There is no client-side `authFetch`
+  equivalent in this project -- if you're tempted to add one, that's a
+  sign you're accidentally reintroducing Version A's pattern here.
 - **`proxy.js`** (Next.js 16 renamed Middleware to Proxy -- same
   mechanism, new file convention) handles route protection AND
   proactive token refresh, since it's the one place in the whole app
@@ -37,21 +37,38 @@ primitives, form/validation conventions, animation, toasts).
   is NOT prefixed `NEXT_PUBLIC_` -- it never needs to reach the client
   bundle, unlike the sibling project where it's unavoidable.
 
+## Routes are namespaced by role, not by a shared `/dashboard` prefix
+
+Protected pages live under the top-level role segments --
+`/admin`, `/faculty`, `/registrar`, `/student` -- plus `/account` for
+pages every role shares (profile, settings, transcript, session
+diagnostics). All of them sit in the `app/(dashboard)` route group so
+they share one layout (the sidebar/header shell) without that group
+name becoming part of the URL. `lib/navigation.js`'s `NAV_BY_ROLE` is
+the single source of truth for which paths exist per role --
+`homePathForRole`/`assertRole` both read from it, as does `proxy.js`'s
+own redirect-after-login logic.
+
 ## Pattern for a new protected page with real data
 
 ```js
-// app/dashboard/something/page.js -- Server Component, no "use client"
-import { serverApiRequest } from "@/lib/server-api";
+// app/(dashboard)/{role}/something/page.js -- Server Component, no "use client"
+import { apiRequest } from "@/lib/server-api";
+import { assertRole } from "@/lib/navigation";
+import { getCurrentUser } from "@/lib/server-api";
 import SomethingView from "./SomethingView";
 
 export default async function SomethingPage() {
-  const data = await serverApiRequest("/api/v1/whatever");
+  const user = await getCurrentUser();
+  assertRole(user, "{role}");
+
+  const data = await apiRequest("/api/v1/whatever");
   return <SomethingView data={data} />;
 }
 ```
 
 ```js
-// app/dashboard/something/SomethingView.js -- Client Component
+// app/(dashboard)/{role}/something/SomethingView.js -- Client Component
 "use client";
 // All styled-components JSX goes here, receiving `data` as a prop.
 // styled-components fundamentally needs client-side JS (theme
@@ -60,14 +77,20 @@ export default async function SomethingPage() {
 // Client Components that do.
 ```
 
-Don't try to add `"use client"` to a page that needs `serverApiRequest`
--- that function uses `next/headers`, which only works in Server
-Components/Route Handlers/Proxy, not Client Components.
+Don't try to add `"use client"` to a page that needs `apiRequest` or
+`getCurrentUser` -- both use `next/headers`, which only works in
+Server Components/Route Handlers/Proxy, not Client Components.
+`getCurrentUser()` specifically is for `/api/v1/users/me` only (it's
+cookie-first, see `lib/server-api.js`'s doc comment) -- every other
+endpoint goes through `apiRequest(path)`, a real network call every time.
 
 ## Extending route protection to a new path
 
-Add it to `proxy.js`'s `config.matcher`. Everything under `/dashboard`
-is already covered by `/dashboard/:path*`.
+Add the new prefix to **both** `PROTECTED_PREFIXES` and
+`config.matcher` in `proxy.js` -- unlike the old single-`/dashboard`
+setup, each role prefix (`/admin`, `/faculty`, `/registrar`,
+`/student`, `/account`) needs its own entry in both places since
+there's no longer one parent segment that covers all of them.
 
 ## Commands
 
@@ -94,7 +117,8 @@ npm run build   # always run this before considering a change done
   login/logout.** A client-side route transition wouldn't guarantee
   Proxy sees the newly-set (or newly-cleared) cookie before the next
   page's server-side fetch runs. This is deliberate in both
-  `login/page.js` and `dashboard/DashboardView.js`.
+  `login/page.js` and `components/dashboard/DashboardShell/index.js`
+  (`handleLogout`).
 - **Same `rt(theme)` fallback pattern as the sibling project** for
   Next.js 16's `/_not-found` prerender issue -- see that project's
   CLAUDE.md for the full explanation if you hit "Cannot read
@@ -103,7 +127,7 @@ npm run build   # always run this before considering a change done
 ## Sample content on the student dashboard
 
 `lib/sample-data.js` holds every piece of placeholder content on
-`/dashboard/home` and in the header popovers (checklist, term
+`/student/home` and in the header popovers (checklist, term
 calendar, documents, notifications, GPA/credits, course progress).
 None of it comes from the API, because none of it has an endpoint yet.
 
@@ -115,7 +139,7 @@ Two rules when working on this:
   record is the failure mode being guarded against.
 - **When a real endpoint lands, delete the matching export from
   `lib/sample-data.js`** and fetch it in the Server Component
-  (`app/dashboard/home/page.js`) instead of adding a client-side
-  fetch. Note that `serverApiRequest` throws on a non-OK response,
-  which takes the whole page to the error boundary -- so don't wire up
-  an endpoint until it's actually deployed.
+  (`app/(dashboard)/student/home/page.js`) instead of adding a
+  client-side fetch. Note that `apiRequest` throws on a non-OK
+  response, which takes the whole page to the error boundary -- so
+  don't wire up an endpoint until it's actually deployed.

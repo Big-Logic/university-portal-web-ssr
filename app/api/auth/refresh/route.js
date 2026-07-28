@@ -9,7 +9,11 @@ const REFRESH_MAX_AGE = 30 * 24 * 60 * 60;
 function getReturnTo(request) {
   const returnTo = request.nextUrl.searchParams.get("returnTo");
   if (!returnTo || !returnTo.startsWith("/")) {
-    return "/dashboard";
+    // "/" does its own lightweight role-decode-and-redirect once this
+    // refresh has set a fresh access-token cookie -- there's no single
+    // shared "/dashboard" bounce point to fall back to anymore now
+    // that routes are namespaced by role.
+    return "/";
   }
   return returnTo;
 }

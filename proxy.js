@@ -1,37 +1,17 @@
 import { NextResponse } from "next/server";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/session";
+import { verifyAccessToken } from "@/lib/jwt";
+import { homePathForRole } from "@/lib/navigation";
 
-/**
- * Decodes a JWT's payload WITHOUT verifying its signature. Deliberate
- * choice, not an oversight: verifying properly would mean either
- * sharing the API's signing secret with this app (new coupling -- if
- * the API rotates its secret, this app silently breaks too) or
- * switching the API to asymmetric signing so this app only needs a
- * public key. Neither is warranted for what this check actually
- * needs to do -- decide whether it's worth rendering a protected
- * page -- since the API independently verifies the signature on every
- * real request regardless of what Middleware decides here. This is a
- * UX gate, not the security boundary.
- */
-function decodeJwtPayload(token) {
-  try {
-    const payload = token.split(".")[1];
-    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const json = atob(base64);
-    return JSON.parse(json);
-  } catch {
-    return null;
-  }
-}
-
-function isExpired(payload) {
-  if (!payload?.exp) return true;
-  return Date.now() >= payload.exp * 1000;
-}
+// Routes are namespaced by role at the top level rather than under a
+// shared /dashboard prefix -- each role's prefix needs its own entry
+// here (and in config.matcher below) since there's no longer one
+// parent segment that covers all of them.
+const PROTECTED_PREFIXES = ["/admin", "/faculty", "/registrar", "/student", "/account"];
 
 export async function proxy(request) {
   const { pathname, search } = request.nextUrl;
-  const isProtected = pathname.startsWith("/dashboard");
+  const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const isLoginPage = pathname === "/login";
 
   if (!isProtected && !isLoginPage) {
@@ -41,20 +21,33 @@ export async function proxy(request) {
   const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
 
-  const accessPayload = accessToken ? decodeJwtPayload(accessToken) : null;
-  const accessValid = accessPayload && !isExpired(accessPayload);
+  const payload = await verifyAccessToken(accessToken);
 
-  if (accessValid) {
-    return isLoginPage
-      ? NextResponse.redirect(new URL("/dashboard", request.url))
-      : NextResponse.next();
+  if (payload) {
+    if (isLoginPage) {
+      return NextResponse.redirect(new URL(homePathForRole(payload.role), request.url));
+    }
+
+    // Forward the now cryptographically-verified identity to Server
+    // Components via request headers -- getCurrentUser() reads these
+    // instead of re-verifying the token or hitting the API again.
+    // These are internal, request-scoped headers Next.js passes along
+    // its own server-side pipeline; they never reach the browser as
+    // response headers.
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-user-id", String(payload.sub));
+    requestHeaders.set("x-user-role", payload.role);
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   if (refreshToken) {
     const refreshUrl = new URL("/api/auth/refresh", request.url);
     refreshUrl.searchParams.set(
+      // Role isn't known yet here (the access token is missing/invalid,
+      // which is why we're refreshing) -- "/" does its own lightweight
+      // verify-and-redirect once the refresh sets a fresh cookie.
       "returnTo",
-      isLoginPage ? "/dashboard" : `${pathname}${search}`,
+      isLoginPage ? "/" : `${pathname}${search}`,
     );
     return NextResponse.redirect(refreshUrl);
   }
@@ -70,5 +63,12 @@ export async function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: [
+    "/admin/:path*",
+    "/faculty/:path*",
+    "/registrar/:path*",
+    "/student/:path*",
+    "/account/:path*",
+    "/login",
+  ],
 };

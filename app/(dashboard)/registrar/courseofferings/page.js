@@ -1,11 +1,11 @@
-import { serverApiRequest } from "@/lib/server-api";
+import { getCurrentUser, apiRequest } from "@/lib/server-api";
 import { assertRole } from "@/lib/navigation";
 import CourseOfferingsView from "./CourseOfferingsView";
 
 export default async function CourseOfferingsPage() {
-  const user = await serverApiRequest("/api/v1/users/me");
+  const user = await getCurrentUser();
   assertRole(user, "registrar");
 
-  const offerings = await serverApiRequest("/api/v1/course-offerings");
+  const offerings = await apiRequest("/api/v1/course-offerings");
   return <CourseOfferingsView offerings={offerings} />;
 }

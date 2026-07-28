@@ -1,9 +1,11 @@
-import { serverApiRequest } from "@/lib/server-api";
+import { apiRequest } from "@/lib/server-api";
 import { assertRole } from "@/lib/navigation";
 import ModuleHub from "@/components/dashboard/ModuleHub";
 
+// Uses apiRequest, not getCurrentUser -- ModuleHub's greeting needs
+// fullName, which was never in the access token.
 export default async function RegistrarHomePage() {
-  const user = await serverApiRequest("/api/v1/users/me");
+  const user = await apiRequest("/api/v1/users/me");
   assertRole(user, "registrar");
 
   return <ModuleHub user={user} />;
