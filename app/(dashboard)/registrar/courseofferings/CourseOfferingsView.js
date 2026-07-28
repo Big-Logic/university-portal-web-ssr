@@ -9,7 +9,10 @@ const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 function formatMeetingTimes(offering) {
   if (!offering.meeting_times?.length) return "—";
   return offering.meeting_times
-    .map((mt) => `${DAY_NAMES[mt.day_of_week] ?? mt.day_of_week} ${mt.start_time}–${mt.end_time}`)
+    .map(
+      (mt) =>
+        `${DAY_NAMES[mt.day_of_week] ?? mt.day_of_week} ${mt.start_time}–${mt.end_time}`,
+    )
     .join(", ");
 }
 
@@ -19,12 +22,17 @@ const COLUMNS = [
     label: "Course",
     render: (row) => (
       <>
-        {row.courses?.code} <span style={{ opacity: 0.6 }}>&middot; sec {row.section}</span>
+        {row.courses?.code}{" "}
+        <span style={{ opacity: 0.6 }}>&middot; sec {row.section}</span>
       </>
     ),
   },
   { key: "term", label: "Term", render: (row) => row.terms?.name || "—" },
-  { key: "instructor", label: "Instructor", render: (row) => row.users?.full_name || "—" },
+  {
+    key: "instructor",
+    label: "Instructor",
+    render: (row) => row.users?.full_name || "—",
+  },
   {
     key: "delivery_mode",
     label: "Delivery",
@@ -38,7 +46,7 @@ const COLUMNS = [
   { key: "meetings", label: "Meets", render: formatMeetingTimes },
 ];
 
-export default function CourseOfferingsView({ offerings }) {
+export default function CourseOfferingsView() {
   return (
     <div>
       <PageIntro
@@ -46,12 +54,12 @@ export default function CourseOfferingsView({ offerings }) {
         heading="Course offerings"
         sub="Every section running or scheduled, with its instructor, enrollment, and meeting pattern."
       />
-      <DataTable
+      {/* <DataTable
         columns={COLUMNS}
         rows={offerings}
         getRowKey={(row) => row.id}
         emptyMessage="No course offerings on file yet."
-      />
+      /> */}
     </div>
   );
 }

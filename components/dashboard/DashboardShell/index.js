@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import styled from "styled-components";
 import { rt } from "@/lib/theme";
+import { clientRequest } from "@/lib/client-api";
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
 import { BREAKPOINT, CONTENT_MAX_WIDTH } from "./constants";
@@ -45,15 +47,34 @@ const ContentArea = styled.main`
   }
 `;
 
-export default function DashboardShell({ user, children }) {
+export default function DashboardShell({ children }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
   const [sidebarMenuOpen, setSidebarMenuOpen] = useState(false);
   const [now, setNow] = useState(null);
-  const [signingOut, setSigningOut] = useState(false);
   const headerMenuRef = useRef(null);
   const sidebarMenuRef = useRef(null);
+
+  // Client-side fetch, deliberately -- the shell (sidebar/header) needs
+  // the same identity data on every route this layout wraps, and
+  // fetching it here once (cached by React Query) beats every single
+  // Server Component page re-fetching it. Goes through a same-origin
+  // Route Handler (app/api/users/me), never the Express API directly.
+  const { data: user, isError } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: () => clientRequest("/api/users/me", { method: "GET" }),
+  });
+
+  // Shouldn't normally happen -- Proxy already gates every route this
+  // shell renders under -- but if the client-side fetch itself comes
+  // back unauthorized (e.g. the cookie expired mid-session), send the
+  // user back through login rather than show a broken shell.
+  useEffect(() => {
+    if (isError) {
+      window.location.href = "/login";
+    }
+  }, [isError]);
 
   // Deferred to a client-only effect on purpose: rendering a live
   // clock during SSR would bake in the server's render-time second,
@@ -84,44 +105,60 @@ export default function DashboardShell({ user, children }) {
     return () => document.removeEventListener("click", onClick);
   }, []);
 
-  async function handleLogout() {
-    setSigningOut(true);
-    await fetch("/api/auth/logout", { method: "POST" });
-    // Full navigation, not router.push -- Proxy needs a fresh request
-    // to see the now-cleared cookies before it decides where to send us.
-    window.location.href = "/login";
+  // onSettled (not onSuccess) -- redirect regardless of outcome, same
+  // as before this used React Query: a failed server-side revoke
+  // isn't something the user needs to see or act on.
+  const logoutMutation = useMutation({
+    mutationFn: () => clientRequest("/api/auth/logout", { method: "POST" }),
+    onSettled: () => {
+      // Full navigation, not router.push -- Proxy needs a fresh
+      // request to see the now-cleared cookies before it decides
+      // where to send us.
+      window.location.href = "/login";
+    },
+  });
+
+  function handleLogout() {
+    logoutMutation.mutate();
   }
 
   return (
     <Shell>
       <Scrim $open={drawerOpen} onClick={() => setDrawerOpen(false)} />
 
-      <Sidebar
-        user={user}
-        pathname={pathname}
-        open={drawerOpen}
-        onCloseDrawer={() => setDrawerOpen(false)}
-        now={now}
-        menuOpen={sidebarMenuOpen}
-        onToggleMenu={() => setSidebarMenuOpen((v) => !v)}
-        onCloseMenu={() => setSidebarMenuOpen(false)}
-        menuRef={sidebarMenuRef}
-        onLogout={handleLogout}
-        signingOut={signingOut}
-      />
+      {/* children is already server-rendered page content -- it
+          doesn't wait on this client-side identity fetch. Only the
+          identity-dependent chrome (nav, avatar, account menu) does. */}
+      {user && (
+        <Sidebar
+          user={user}
+          pathname={pathname}
+          open={drawerOpen}
+          onCloseDrawer={() => setDrawerOpen(false)}
+          now={now}
+          menuOpen={sidebarMenuOpen}
+          onToggleMenu={() => setSidebarMenuOpen((v) => !v)}
+          onCloseMenu={() => setSidebarMenuOpen(false)}
+          menuRef={sidebarMenuRef}
+          onLogout={handleLogout}
+          signingOut={logoutMutation.isPending}
+        />
+      )}
 
       <Main>
-        <DashboardHeader
-          user={user}
-          now={now}
-          menuOpen={headerMenuOpen}
-          onToggleMenu={() => setHeaderMenuOpen((v) => !v)}
-          onCloseMenu={() => setHeaderMenuOpen(false)}
-          menuRef={headerMenuRef}
-          onLogout={handleLogout}
-          signingOut={signingOut}
-          onOpenDrawer={() => setDrawerOpen(true)}
-        />
+        {user && (
+          <DashboardHeader
+            user={user}
+            now={now}
+            menuOpen={headerMenuOpen}
+            onToggleMenu={() => setHeaderMenuOpen((v) => !v)}
+            onCloseMenu={() => setHeaderMenuOpen(false)}
+            menuRef={headerMenuRef}
+            onLogout={handleLogout}
+            signingOut={logoutMutation.isPending}
+            onOpenDrawer={() => setDrawerOpen(true)}
+          />
+        )}
 
         <ContentArea>{children}</ContentArea>
       </Main>

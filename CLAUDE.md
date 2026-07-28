@@ -22,8 +22,19 @@ primitives, form/validation conventions, animation, toasts).
   page under the `(dashboard)` route group is a Server Component (no
   `"use client"`) that calls the Express API directly, server-to-server,
   using `lib/server-api.js`. There is no client-side `authFetch`
-  equivalent in this project -- if you're tempted to add one, that's a
-  sign you're accidentally reintroducing Version A's pattern here.
+  equivalent for *page* data in this project -- if you're tempted to add
+  one, that's a sign you're accidentally reintroducing Version A's
+  pattern here.
+  - **One deliberate exception:** `components/dashboard/DashboardShell`
+    fetches the signed-in user's identity itself, client-side, via
+    React Query (`useQuery` calling `GET /api/users/me`, a same-origin
+    Route Handler that proxies `forwardApiRequest` -- the browser still
+    never touches the Express API directly). This is the one thing
+    every route under `(dashboard)` needs identically, so fetching it
+    once in the shared shell beats every page re-fetching it
+    server-side. `app/(dashboard)/layout.js` no longer fetches or
+    passes down a `user` prop because of this -- don't reintroduce that
+    without removing this client fetch first, or the two will race.
 - **`proxy.js`** (Next.js 16 renamed Middleware to Proxy -- same
   mechanism, new file convention) handles route protection AND
   proactive token refresh, since it's the one place in the whole app

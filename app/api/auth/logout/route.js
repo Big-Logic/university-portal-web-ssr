@@ -12,7 +12,7 @@ export async function POST() {
     // Best-effort -- if this fails (already expired, API briefly
     // down), we still clear the local cookies either way. A failed
     // server-side revoke isn't something the user needs to see or act on.
-    await fetch(`${API_URL}/api/v1/auth/logout`, {
+    fetch(`${API_URL}/api/v1/auth/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),

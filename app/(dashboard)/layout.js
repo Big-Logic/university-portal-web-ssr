@@ -4,19 +4,13 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 // Server Component, shared by every role-namespaced route (/admin,
 // /faculty, /registrar, /student, /account) via this route group --
 // (dashboard) doesn't add a URL segment, it's just how these otherwise
-// unrelated top-level paths share one layout. Only `user` (plain,
-// serializable data) crosses into the Client Component below -- the
-// nav list is derived from user.role *inside* DashboardShell instead
-// of being built here and passed down, because its icon fields are
-// React components, and functions can't be passed as props across the
-// server/client boundary.
-//
-// Uses apiRequest (a real fetch), not getCurrentUser -- the shell
-// displays fullName/email, and those were never in the access token
-// to begin with (it only carries { sub, role }), so there's nothing
-// for a token-derived helper to read them from.
+// unrelated top-level paths share one layout. No server-side fetch
+// here: DashboardShell fetches its own identity data client-side (via
+// React Query, see its own file) instead of receiving `user` as a
+// prop, so this layout has nothing left to do but render the shell
+// around whichever page is active.
 export default async function DashboardLayout({ children }) {
-  const user = await getCurrentUser();
+  await getCurrentUser(); // ensure the user is logged in before rendering the shell
 
-  return <DashboardShell user={user}>{children}</DashboardShell>;
+  return <DashboardShell>{children}</DashboardShell>;
 }

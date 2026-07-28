@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import styled from "styled-components";
 import { toast } from "sonner";
 import { UserPlus, ShieldCheck, Ban, RotateCcw } from "lucide-react";
 import { rt } from "@/lib/theme";
+import { clientRequest } from "@/lib/client-api";
 import { Card, Alert } from "@/components/ui/primitives";
 import Field from "@/components/ui/Field";
 import Button from "@/components/ui/Button";
@@ -115,31 +117,27 @@ function CreateUserCard({ onCreated }) {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({ resolver: zodResolver(createUserSchema), defaultValues: { role: "faculty" } });
 
-  async function onSubmit(values) {
-    setServerError(null);
-    try {
-      const res = await fetch("/api/admin/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        setServerError(data?.error?.message || "Couldn't create that account.");
-        return;
-      }
-
+  const createMutation = useMutation({
+    mutationFn: (values) =>
+      clientRequest("/api/admin/users", {
+        body: values,
+        fallbackMessage: "Couldn't create that account.",
+      }),
+    onSuccess: (data, variables) => {
       toast.success(`Account created for ${data.email}`);
       setCreated(data);
       onCreated?.(data.id);
-      reset({ email: "", full_name: "", role: values.role });
-    } catch {
-      setServerError("Couldn't reach the server. Check your connection and try again.");
-    }
+      reset({ email: "", full_name: "", role: variables.role });
+    },
+    onError: (err) => setServerError(err.message),
+  });
+
+  function onSubmit(values) {
+    setServerError(null);
+    createMutation.mutate(values);
   }
 
   return (
@@ -172,7 +170,7 @@ function CreateUserCard({ onCreated }) {
 
         {serverError && <Alert $tone="danger" role="alert">{serverError}</Alert>}
 
-        <Button type="submit" loading={isSubmitting} loadingText="Creating…">
+        <Button type="submit" loading={createMutation.isPending} loadingText="Creating…">
           <UserPlus size={15} aria-hidden="true" />
           Create account
         </Button>
@@ -197,67 +195,58 @@ function CreateUserCard({ onCreated }) {
 function ManageUserCard({ presetId }) {
   const [userId, setUserId] = useState(presetId || "");
   const [role, setRole] = useState(STAFF_ROLES[0]);
-  const [pendingAction, setPendingAction] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
   const idValid = /^\d+$/.test(String(userId).trim());
 
-  async function callStatus(active) {
+  const statusMutation = useMutation({
+    mutationFn: ({ userId: id, active }) =>
+      clientRequest(`/api/admin/users/${id}/status`, {
+        method: "PATCH",
+        body: { active },
+        fallbackMessage: "That update failed.",
+      }),
+    onSuccess: (data) => {
+      toast.success(`Account #${data.id} is now ${data.is_active ? "active" : "deactivated"}.`);
+      setResult(data);
+    },
+    onError: (err) => setError(err.message),
+  });
+
+  const roleMutation = useMutation({
+    mutationFn: ({ userId: id, role: newRole }) =>
+      clientRequest(`/api/admin/users/${id}/role`, {
+        method: "PATCH",
+        body: { role: newRole },
+        fallbackMessage: "That update failed.",
+      }),
+    onSuccess: (data) => {
+      toast.success(
+        data.changed ? `Account #${data.id} is now ${data.role}.` : `Account #${data.id} already has that role.`
+      );
+      setResult(data);
+    },
+    onError: (err) => setError(err.message),
+  });
+
+  function callStatus(active) {
     if (!idValid) {
       setError("Enter a numeric user ID first.");
       return;
     }
     setError(null);
-    setPendingAction(active ? "reactivate" : "deactivate");
-    try {
-      const res = await fetch(`/api/admin/users/${userId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ active }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError(data?.error?.message || "That update failed.");
-        return;
-      }
-      toast.success(`Account #${data.id} is now ${data.is_active ? "active" : "deactivated"}.`);
-      setResult(data);
-    } catch {
-      setError("Couldn't reach the server. Check your connection and try again.");
-    } finally {
-      setPendingAction(null);
-    }
+    statusMutation.mutate({ userId, active });
   }
 
-  async function handleRoleUpdate(e) {
+  function handleRoleUpdate(e) {
     e.preventDefault();
     if (!idValid) {
       setError("Enter a numeric user ID first.");
       return;
     }
     setError(null);
-    setPendingAction("role");
-    try {
-      const res = await fetch(`/api/admin/users/${userId}/role`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) {
-        setError(data?.error?.message || "That update failed.");
-        return;
-      }
-      toast.success(
-        data.changed ? `Account #${data.id} is now ${data.role}.` : `Account #${data.id} already has that role.`
-      );
-      setResult(data);
-    } catch {
-      setError("Couldn't reach the server. Check your connection and try again.");
-    } finally {
-      setPendingAction(null);
-    }
+    roleMutation.mutate({ userId, role });
   }
 
   return (
@@ -283,7 +272,7 @@ function ManageUserCard({ presetId }) {
         {error && <Alert $tone="danger" role="alert">{error}</Alert>}
 
         <ButtonRow>
-          <Button type="submit" variant="secondary" loading={pendingAction === "role"} loadingText="Updating…">
+          <Button type="submit" variant="secondary" loading={roleMutation.isPending} loadingText="Updating…">
             <ShieldCheck size={15} aria-hidden="true" />
             Update role
           </Button>
@@ -291,7 +280,7 @@ function ManageUserCard({ presetId }) {
             type="button"
             variant="secondary"
             onClick={() => callStatus(false)}
-            loading={pendingAction === "deactivate"}
+            loading={statusMutation.isPending && statusMutation.variables?.active === false}
             loadingText="Deactivating…"
           >
             <Ban size={15} aria-hidden="true" />
@@ -301,7 +290,7 @@ function ManageUserCard({ presetId }) {
             type="button"
             variant="secondary"
             onClick={() => callStatus(true)}
-            loading={pendingAction === "reactivate"}
+            loading={statusMutation.isPending && statusMutation.variables?.active === true}
             loadingText="Reactivating…"
           >
             <RotateCcw size={15} aria-hidden="true" />

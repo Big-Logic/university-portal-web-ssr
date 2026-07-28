@@ -6,9 +6,5 @@ export default async function MyTeachingPage() {
   const user = await getCurrentUser();
   assertRole(user, "faculty");
 
-  // course_offerings.instructor_id is a foreign key straight to
-  // users.id, so "my" offerings is just this filter -- no separate
-  // instructor/faculty id to look up first.
-  const offerings = await apiRequest(`/api/v1/course-offerings?instructor_id=${user.id}`);
-  return <MyTeachingView offerings={offerings} />;
+  return <MyTeachingView />;
 }

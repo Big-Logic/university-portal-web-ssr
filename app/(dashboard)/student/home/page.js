@@ -1,4 +1,4 @@
-import { apiRequest } from "@/lib/server-api";
+import { getCurrentUser } from "@/lib/server-api";
 import { assertRole } from "@/lib/navigation";
 import StudentHomeView from "./StudentHomeView";
 
@@ -13,7 +13,7 @@ import StudentHomeView from "./StudentHomeView";
 // Uses apiRequest, not getCurrentUser -- the "Welcome back, {name}"
 // greeting needs fullName, which was never in the access token.
 export default async function StudentHomePage() {
-  const user = await apiRequest("/api/v1/users/me");
+  const user = await getCurrentUser();
   assertRole(user, "student");
 
   return <StudentHomeView user={user} />;

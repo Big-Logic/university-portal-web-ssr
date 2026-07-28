@@ -14,8 +14,6 @@ const REFRESH_MAX_AGE = 30 * 24 * 60 * 60; // 30 days, in seconds
 export async function POST(request) {
   const body = await request.json().catch(() => null);
 
-  console.log("Login request body:", body);
-
   const apiRes = await fetch(`${API_URL}/api/v1/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

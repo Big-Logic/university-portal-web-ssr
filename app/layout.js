@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import StyledComponentsRegistry from "@/lib/registry";
 import GlobalStyles from "@/lib/globalStyles";
 import { theme } from "@/lib/theme";
+import QueryProvider from "@/components/QueryProvider";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -29,8 +30,10 @@ export default function RootLayout({ children }) {
         <StyledComponentsRegistry>
           <ThemeProvider theme={theme}>
             <GlobalStyles />
-            {children}
-            <Toaster position="top-right" richColors closeButton />
+            <QueryProvider>
+              {children}
+              <Toaster position="top-right" richColors closeButton />
+            </QueryProvider>
           </ThemeProvider>
         </StyledComponentsRegistry>
       </body>

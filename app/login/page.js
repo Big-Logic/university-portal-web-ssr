@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import styled from "styled-components";
 import { rt } from "@/lib/theme";
 import { motion } from "framer-motion";
 import { GraduationCap } from "lucide-react";
 import { loginSchema } from "@/lib/validation";
 import { homePathForRole } from "@/lib/navigation";
+import { clientRequest } from "@/lib/client-api";
 import Button from "@/components/ui/Button";
 import Field from "@/components/ui/Field";
 import { Card, Alert } from "@/components/ui/primitives";
@@ -33,7 +35,8 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => rt(theme).space[3]};
-  padding: ${({ theme }) => rt(theme).space[4]} ${({ theme }) => rt(theme).space[6]};
+  padding: ${({ theme }) => rt(theme).space[4]}
+    ${({ theme }) => rt(theme).space[6]};
   border-bottom: 1px solid ${({ theme }) => rt(theme).color.ink150};
 `;
 
@@ -124,7 +127,10 @@ const VisualSide = styled.div`
 const VisualPattern = styled.div`
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(${({ theme }) => rt(theme).color.blue700} 1px, transparent 1px);
+  background-image: radial-gradient(
+    ${({ theme }) => rt(theme).color.blue700} 1px,
+    transparent 1px
+  );
   background-size: 28px 28px;
   opacity: 0.25;
 `;
@@ -166,38 +172,28 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({ resolver: zodResolver(loginSchema) });
 
-  async function onSubmit(values) {
-    setFormError(null);
-    try {
-      // Same-origin call to our own Route Handler -- not the Express
-      // API directly. This is the one request in the whole app that
-      // never touches Express from the browser at all, which is also
-      // why it needs no CORS configuration on either side: the
-      // browser only ever talks to its own origin here.
-      const res = await fetch("/api/auth/login", {
+  const loginMutation = useMutation({
+    mutationFn: (values) =>
+      clientRequest("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        setFormError(data?.error?.message || "Sign-in failed. Check your credentials and try again.");
-        return;
-      }
-
+        body: values,
+      }),
+    onSuccess: (data) => {
       // Full navigation, not router.push -- the httpOnly cookie was
       // just set on this response, and Proxy needs a fresh request to
       // see it before the destination page's server-side fetch will
       // succeed. A client-side route transition wouldn't guarantee that.
       window.location.href = homePathForRole(data?.user?.role);
-    } catch {
-      setFormError("Couldn't reach the server. Check your connection and try again.");
-    }
+    },
+    onError: (err) => setFormError(err.message),
+  });
+
+  function onSubmit(values) {
+    setFormError(null);
+    loginMutation.mutate(values);
   }
 
   return (
@@ -250,9 +246,18 @@ export default function LoginPage() {
                   Remember me
                 </RememberRow>
 
-                {formError && <Alert $tone="danger" role="alert">{formError}</Alert>}
+                {formError && (
+                  <Alert $tone="danger" role="alert">
+                    {formError}
+                  </Alert>
+                )}
 
-                <Button type="submit" block loading={isSubmitting} loadingText="Signing in…">
+                <Button
+                  type="submit"
+                  block
+                  loading={loginMutation.isPending}
+                  loadingText="Signing in…"
+                >
                   Log in
                 </Button>
               </FormEl>
@@ -272,8 +277,8 @@ export default function LoginPage() {
             Every <span>record</span>, one ledger.
           </VisualQuote>
           <VisualCaption>
-            Courses, offerings, and enrollment, kept in the same system of record across every
-            institution that runs on Basecourse.
+            Courses, offerings, and enrollment, kept in the same system of
+            record across every institution that runs on Basecourse.
           </VisualCaption>
         </VisualContent>
       </VisualSide>

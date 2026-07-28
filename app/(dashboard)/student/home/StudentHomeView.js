@@ -47,13 +47,15 @@ const Tab = styled.button`
   padding: 0 0 13px;
   border: none;
   border-bottom: 2px solid
-    ${({ theme, $active }) => ($active ? rt(theme).color.blue600 : "transparent")};
+    ${({ theme, $active }) =>
+      $active ? rt(theme).color.blue600 : "transparent"};
   margin-bottom: -1px;
   background: none;
   font-family: inherit;
   font-size: 14px;
   font-weight: ${({ $active }) => ($active ? 700 : 500)};
-  color: ${({ theme, $active }) => ($active ? rt(theme).color.ink900 : rt(theme).color.ink500)};
+  color: ${({ theme, $active }) =>
+    $active ? rt(theme).color.ink900 : rt(theme).color.ink500};
   cursor: pointer;
 
   &:hover {
@@ -266,14 +268,18 @@ const CheckBox = styled.span`
   justify-content: center;
   color: ${({ theme }) => rt(theme).color.white};
   border: ${({ theme, $done }) =>
-    $done ? `1px solid ${rt(theme).color.blue600}` : `1.5px solid ${rt(theme).color.ink300}`};
-  background: ${({ theme, $done }) => ($done ? rt(theme).color.blue600 : rt(theme).color.white)};
+    $done
+      ? `1px solid ${rt(theme).color.blue600}`
+      : `1.5px solid ${rt(theme).color.ink300}`};
+  background: ${({ theme, $done }) =>
+    $done ? rt(theme).color.blue600 : rt(theme).color.white};
 `;
 
 const CheckLabel = styled.div`
   font-size: 13.5px;
   font-weight: 600;
-  color: ${({ theme, $done }) => ($done ? rt(theme).color.ink300 : rt(theme).color.ink900)};
+  color: ${({ theme, $done }) =>
+    $done ? rt(theme).color.ink300 : rt(theme).color.ink900};
   text-decoration: ${({ $done }) => ($done ? "line-through" : "none")};
 `;
 
@@ -338,7 +344,9 @@ export default function StudentHomeView({ user }) {
   const [done, setDone] = useState(CHECKLIST_INITIAL_DONE);
 
   const doneCount = CHECKLIST.filter((item) => done[item.id]).length;
-  const termPct = Math.round((TERM_PROGRESS.weeksElapsed / TERM_PROGRESS.weeksTotal) * 100);
+  const termPct = Math.round(
+    (TERM_PROGRESS.weeksElapsed / TERM_PROGRESS.weeksTotal) * 100,
+  );
 
   function toggleItem(id) {
     setDone((current) => ({ ...current, [id]: !current[id] }));
@@ -348,7 +356,7 @@ export default function StudentHomeView({ user }) {
     <Page>
       <NoticeBanner />
 
-      <Tabs role="tablist">
+      {/* <Tabs role="tablist">
         {TABS.map((t) => (
           <Tab
             key={t.id}
@@ -361,16 +369,14 @@ export default function StudentHomeView({ user }) {
             {t.label}
           </Tab>
         ))}
-      </Tabs>
+      </Tabs> */}
 
-      <Title>Welcome back, {firstName}.</Title>
-
+      {/* <Title>Welcome back, {firstName}.</Title> */}
+      <Title>Welcome back.</Title>
+      {/* 
       {tab !== "overview" ? (
         <EmptyPanel>
-          {/* Single template expression on purpose: writing this as
-              `{label} hasn't been built yet.` across two lines makes JSX
-              strip the newline+indent between them and render
-              "Supporthasn't been built yet." */}
+          
           {`${TABS.find((t) => t.id === tab).label} hasn\u2019t been built yet.`}
         </EmptyPanel>
       ) : (
@@ -393,7 +399,9 @@ export default function StudentHomeView({ user }) {
                 <PanelTitle>Academic progress</PanelTitle>
                 <Badge $tone="neutral">Sample</Badge>
               </PanelHead>
-              <PanelSub>Grading &amp; transcripts aren&rsquo;t connected yet.</PanelSub>
+              <PanelSub>
+                Grading &amp; transcripts aren&rsquo;t connected yet.
+              </PanelSub>
 
               <MeterLabel>Term progress (weeks)</MeterLabel>
               <MeterRow>
@@ -405,7 +413,8 @@ export default function StudentHomeView({ user }) {
                   />
                 </MeterTrack>
                 <MeterValue>
-                  {TERM_PROGRESS.weeksElapsed} / {TERM_PROGRESS.weeksTotal} weeks
+                  {TERM_PROGRESS.weeksElapsed} / {TERM_PROGRESS.weeksTotal}{" "}
+                  weeks
                 </MeterValue>
               </MeterRow>
 
@@ -466,7 +475,8 @@ export default function StudentHomeView({ user }) {
                 <Badge $tone="neutral">Sample</Badge>
               </PanelHead>
               <PanelSub>
-                Enrollment endpoints exist on the API but aren&rsquo;t wired into this page yet.
+                Enrollment endpoints exist on the API but aren&rsquo;t wired
+                into this page yet.
               </PanelSub>
 
               {COURSES.map((course) => (
@@ -480,18 +490,22 @@ export default function StudentHomeView({ user }) {
                     <MeterTrack>
                       <MeterFill
                         initial={{ width: 0 }}
-                        animate={{ width: `${Math.round(course.progress * 100)}%` }}
+                        animate={{
+                          width: `${Math.round(course.progress * 100)}%`,
+                        }}
                         transition={{ duration: 0.5, ease: "easeOut" }}
                       />
                     </MeterTrack>
                   </CourseMeter>
-                  <Badge $tone={course.progress >= 1 ? "success" : "accent"}>{course.status}</Badge>
+                  <Badge $tone={course.progress >= 1 ? "success" : "accent"}>
+                    {course.status}
+                  </Badge>
                 </Row>
               ))}
             </Panel>
           </GridNarrow>
         </>
-      )}
+      )} */}
     </Page>
   );
 }

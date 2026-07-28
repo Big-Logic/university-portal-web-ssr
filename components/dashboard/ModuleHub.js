@@ -43,7 +43,9 @@ const ModuleCard = styled(Link)`
   border-radius: ${({ theme }) => rt(theme).radius.lg};
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease;
 
   &:hover {
     text-decoration: none;
@@ -92,7 +94,7 @@ const NoticeWrap = styled.div`
  * the client, rather than built server-side and passed as a prop.
  */
 export default function ModuleHub({ user }) {
-  const firstName = user.fullName?.split(" ")[0] || user.fullName;
+  // const firstName = user.fullName?.split(" ")[0] || user.fullName;
   const modules = navForRole(user.role).slice(1);
 
   return (
@@ -101,7 +103,8 @@ export default function ModuleHub({ user }) {
         <NoticeBanner />
       </NoticeWrap>
       <Eyebrow>Dashboard</Eyebrow>
-      <Heading>Welcome back, {firstName}.</Heading>
+      {/* <Heading>Welcome back, {firstName}.</Heading> */}
+      <Heading>Welcome back.</Heading>
       <Sub>
         Signed in as <Badge $tone="accent">{user.role}</Badge>
       </Sub>
@@ -116,13 +119,17 @@ export default function ModuleHub({ user }) {
                   <Icon size={18} aria-hidden="true" />
                 </IconBadge>
                 <ModuleLabel>{item.label}</ModuleLabel>
-                {item.description && <ModuleDescription>{item.description}</ModuleDescription>}
+                {item.description && (
+                  <ModuleDescription>{item.description}</ModuleDescription>
+                )}
               </ModuleCard>
             );
           })}
         </Grid>
       ) : (
-        <EmptyNote>No additional modules are assigned to your account yet.</EmptyNote>
+        <EmptyNote>
+          No additional modules are assigned to your account yet.
+        </EmptyNote>
       )}
     </div>
   );
