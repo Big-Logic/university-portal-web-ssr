@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import StyledComponentsRegistry from "@/lib/registry";
 import GlobalStyles from "@/lib/globalStyles";
 import { theme } from "@/lib/theme";
-import QueryProvider from "@/components/QueryProvider";
+import QueryProvider from "@/providers/QueryProvider";
 
 const manrope = Manrope({
   variable: "--font-manrope",

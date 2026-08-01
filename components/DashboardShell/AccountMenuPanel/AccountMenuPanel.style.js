@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
 import styled from "styled-components";
-import { UserCircle, Settings, FileText, FileClock, LogOut } from "lucide-react";
 import { rt } from "@/lib/theme";
 
 // Unpositioned base panel -- each caller (header kebab, mobile sidebar
@@ -88,43 +85,11 @@ const ItemBtn = styled.button`
   }
 `;
 
-// Shared dropdown content for both the header's and the mobile
-// sidebar's "more options" kebab -- identical items, just anchored
-// differently by each caller via AccountMenuPanel.
-export default function AccountMenuItems({
-  user,
-  onNavigate,
-  onLogout,
-  signingOut,
-}) {
-  return (
-    <>
-      <Header>
-        <Name>{user.fullName}</Name>
-        <Email>{user.email}</Email>
-      </Header>
-      <Divider />
-      <ItemLink href="/account/profile" onClick={onNavigate}>
-        <UserCircle size={16} aria-hidden="true" />
-        <span>Your profile</span>
-      </ItemLink>
-      <ItemLink href="/account/settings" onClick={onNavigate}>
-        <Settings size={16} aria-hidden="true" />
-        <span>Account settings</span>
-      </ItemLink>
-      <ItemLink href="/account/transcript" onClick={onNavigate}>
-        <FileText size={16} aria-hidden="true" />
-        <span>Request a transcript</span>
-      </ItemLink>
-      <ItemLink href="/account/session" onClick={onNavigate}>
-        <FileClock size={16} aria-hidden="true" />
-        <span>Session diagnostics</span>
-      </ItemLink>
-      <Divider />
-      <ItemBtn onClick={onLogout} disabled={signingOut}>
-        <LogOut size={16} aria-hidden="true" />
-        <span>{signingOut ? "Signing out…" : "Log out"}</span>
-      </ItemBtn>
-    </>
-  );
-}
+export default {
+  Header,
+  Name,
+  Email,
+  Divider,
+  ItemLink,
+  ItemBtn,
+};

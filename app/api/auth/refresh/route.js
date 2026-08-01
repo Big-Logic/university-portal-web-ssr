@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { ACCESS_COOKIE, REFRESH_COOKIE, COOKIE_OPTIONS } from "@/lib/session";
+import {
+  ACCESS_COOKIE,
+  REFRESH_COOKIE,
+  COOKIE_OPTIONS,
+  ACCESS_MAX_AGE,
+  REFRESH_MAX_AGE,
+} from "@/lib/session";
 
 const API_URL = process.env.API_URL;
-const ACCESS_MAX_AGE = 15 * 60;
-const REFRESH_MAX_AGE = 30 * 24 * 60 * 60;
 
 function getReturnTo(request) {
   const returnTo = request.nextUrl.searchParams.get("returnTo");

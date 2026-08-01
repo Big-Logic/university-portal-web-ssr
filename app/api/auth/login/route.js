@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { ACCESS_COOKIE, REFRESH_COOKIE, COOKIE_OPTIONS } from "@/lib/session";
+import {
+  ACCESS_COOKIE,
+  REFRESH_COOKIE,
+  COOKIE_OPTIONS,
+  ACCESS_MAX_AGE,
+  REFRESH_MAX_AGE,
+} from "@/lib/session";
 
 const API_URL = process.env.API_URL;
-
-// These durations should match the API's own JWT_ACCESS_EXPIRES_IN /
-// JWT_REFRESH_EXPIRES_IN_DAYS (see the API repo's .env). They're
-// duplicated here rather than fetched at runtime -- a small, real
-// coupling between the two apps worth knowing about if either value
-// changes on the API side.
-const ACCESS_MAX_AGE = 15 * 60; // 15 minutes, in seconds
-const REFRESH_MAX_AGE = 30 * 24 * 60 * 60; // 30 days, in seconds
 
 export async function POST(request) {
   const body = await request.json().catch(() => null);

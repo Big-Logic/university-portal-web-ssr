@@ -1,5 +1,3 @@
-"use client";
-
 import styled from "styled-components";
 import { rt } from "@/lib/theme";
 
@@ -33,34 +31,10 @@ const ValueMono = styled(Value)`
   font-family: ${({ theme }) => rt(theme).font.mono};
 `;
 
-export function formatClock(date) {
-  return date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
-
-export function formatDate(date) {
-  return date.toLocaleDateString([], {
-    weekday: "short",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-export default function TimeDateCards({ now }) {
-  return (
-    <Row>
-      <Card>
-        <Label>Local time</Label>
-        <ValueMono>{formatClock(now)}</ValueMono>
-      </Card>
-      <Card>
-        <Label>Today</Label>
-        <Value>{formatDate(now)}</Value>
-      </Card>
-    </Row>
-  );
-}
+export default {
+  Row,
+  Card,
+  Label,
+  Value,
+  ValueMono,
+};

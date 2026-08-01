@@ -25,16 +25,29 @@ primitives, form/validation conventions, animation, toasts).
   equivalent for *page* data in this project -- if you're tempted to add
   one, that's a sign you're accidentally reintroducing Version A's
   pattern here.
-  - **One deliberate exception:** `components/dashboard/DashboardShell`
-    fetches the signed-in user's identity itself, client-side, via
+  - **One deliberate exception:** the signed-in user's *full profile*
+    (fullName/email/role, for display) is fetched client-side, via
     React Query (`useQuery` calling `GET /api/users/me`, a same-origin
-    Route Handler that proxies `forwardApiRequest` -- the browser still
-    never touches the Express API directly). This is the one thing
-    every route under `(dashboard)` needs identically, so fetching it
-    once in the shared shell beats every page re-fetching it
-    server-side. `app/(dashboard)/layout.js` no longer fetches or
-    passes down a `user` prop because of this -- don't reintroduce that
-    without removing this client fetch first, or the two will race.
+    Route Handler that proxies `forwardApiRequest` -- the browser
+    still never touches the Express API directly). `UserIdentity` and
+    `AccountMenuItems` (in `AccountMenuPanel.js`) each call this
+    themselves through the shared `useCurrentUser` hook
+    (`hooks/useCurrentUser.js`) rather than receiving it as a prop
+    from a parent -- a shared `queryKey` means React Query dedupes
+    every caller onto one network request, so this still isn't
+    per-page re-fetching. `DashboardHeader` doesn't touch `user` at all since it only ever
+    forwarded it.
+  - **Separately, `Sidebar`'s nav does NOT use that hook.** It only
+    needs `role`, and `app/(dashboard)/layout.js` already calls
+    `getCurrentUser()` (headers Proxy set, no network call) to gate
+    access to the whole route group -- that lightweight `{ id, role }`
+    is passed down as a `user` prop through `DashboardShell` to
+    `Sidebar` to `Sidebar/Nav.js` (a Client Component; it just renders
+    styled nav links, `getCurrentUser` itself can't be called from a
+    Client Component since it uses `next/headers`). This is a
+    different data source than the React Query profile fetch above --
+    one's a header read for role-gating, the other's a network call
+    for display data -- so the two don't race each other.
 - **`proxy.js`** (Next.js 16 renamed Middleware to Proxy -- same
   mechanism, new file convention) handles route protection AND
   proactive token refresh, since it's the one place in the whole app
@@ -128,8 +141,10 @@ npm run build   # always run this before considering a change done
   login/logout.** A client-side route transition wouldn't guarantee
   Proxy sees the newly-set (or newly-cleared) cookie before the next
   page's server-side fetch runs. This is deliberate in both
-  `login/page.js` and `components/dashboard/DashboardShell/index.js`
-  (`handleLogout`).
+  `login/page.js` and `hooks/useLogout.js` -- called by
+  `AccountMenuItems` (`components/DashboardShell/AccountMenuPanel`),
+  the actual "Log out" button both `UserIdentity`'s and `Sidebar`'s
+  dropdowns render, same self-fetching pattern as `useCurrentUser`.
 - **Same `rt(theme)` fallback pattern as the sibling project** for
   Next.js 16's `/_not-found` prerender issue -- see that project's
   CLAUDE.md for the full explanation if you hit "Cannot read

@@ -1,16 +1,8 @@
-"use client";
-
 import Link from "next/link";
 import styled from "styled-components";
-import { X, EllipsisVertical } from "lucide-react";
 import { rt } from "@/lib/theme";
-import { navForRole } from "@/lib/navigation";
-import Brand from "./Brand";
-import RegistrationPromo from "./RegistrationPromo";
-import TimeDateCards from "./TimeDateCards";
-import UserIdentity, { KebabButton } from "./UserIdentity";
-import AccountMenuItems, { AccountMenuPanel } from "./AccountMenuPanel";
-import { BREAKPOINT } from "./constants";
+import { AccountMenuPanel } from "../AccountMenuPanel";
+import { BREAKPOINT } from "../constants";
 
 const SidebarAside = styled.aside`
   width: 260px;
@@ -133,82 +125,14 @@ const SidebarMenuPanel = styled(AccountMenuPanel)`
   right: 0;
 `;
 
-export default function Sidebar({
-  user,
-  pathname,
-  open,
-  onCloseDrawer,
-  now,
-  menuOpen,
-  onToggleMenu,
-  onCloseMenu,
-  menuRef,
-  onLogout,
-  signingOut,
-}) {
-  const nav = navForRole(user.role);
-
-  return (
-    <SidebarAside $open={open}>
-      <BrandRow>
-        <Brand />
-        <CloseDrawerBtn onClick={onCloseDrawer} aria-label="Close menu">
-          <X size={16} aria-hidden="true" />
-        </CloseDrawerBtn>
-      </BrandRow>
-
-      <Nav>
-        {nav.map((item) => {
-          const Icon = item.icon;
-          const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
-          return (
-            <NavLink
-              key={item.href}
-              href={item.href}
-              $active={active}
-              onClick={onCloseDrawer}
-            >
-              <Icon size={17} aria-hidden="true" />
-              <span>{item.label}</span>
-            </NavLink>
-          );
-        })}
-      </Nav>
-
-      <Footer ref={menuRef}>
-        <RegistrationPromo />
-
-        {now && (
-          <MobileMeta>
-            <TimeDateCards now={now} />
-
-            <IdentityRow>
-              <UserIdentity user={user} />
-              <KebabButton
-                type="button"
-                $open={menuOpen}
-                onClick={onToggleMenu}
-                aria-label="More options"
-                aria-expanded={menuOpen}
-              >
-                <EllipsisVertical size={18} aria-hidden="true" />
-              </KebabButton>
-            </IdentityRow>
-          </MobileMeta>
-        )}
-
-        {menuOpen && (
-          <SidebarMenuPanel>
-            <AccountMenuItems
-              user={user}
-              onNavigate={onCloseMenu}
-              onLogout={onLogout}
-              signingOut={signingOut}
-            />
-          </SidebarMenuPanel>
-        )}
-      </Footer>
-    </SidebarAside>
-  );
-}
+export default {
+  SidebarAside,
+  BrandRow,
+  CloseDrawerBtn,
+  Nav,
+  NavLink,
+  Footer,
+  MobileMeta,
+  IdentityRow,
+  SidebarMenuPanel,
+};

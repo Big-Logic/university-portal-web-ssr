@@ -1,7 +1,4 @@
-"use client";
-
 import styled from "styled-components";
-import { GraduationCap } from "lucide-react";
 import { rt } from "@/lib/theme";
 
 const Mark = styled.div`
@@ -23,13 +20,7 @@ const Name = styled.div`
   flex: 1;
 `;
 
-export default function Brand() {
-  return (
-    <>
-      <Mark>
-        <GraduationCap size={18} aria-hidden="true" />
-      </Mark>
-      <Name>Basecourse</Name>
-    </>
-  );
-}
+export default {
+  Mark,
+  Name,
+};

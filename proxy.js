@@ -7,11 +7,19 @@ import { homePathForRole } from "@/lib/navigation";
 // shared /dashboard prefix -- each role's prefix needs its own entry
 // here (and in config.matcher below) since there's no longer one
 // parent segment that covers all of them.
-const PROTECTED_PREFIXES = ["/admin", "/faculty", "/registrar", "/student", "/account"];
+const PROTECTED_PREFIXES = [
+  "/admin",
+  "/faculty",
+  "/registrar",
+  "/student",
+  "/account",
+];
 
 export async function proxy(request) {
   const { pathname, search } = request.nextUrl;
-  const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix),
+  );
   const isLoginPage = pathname === "/login";
 
   if (!isProtected && !isLoginPage) {
@@ -25,7 +33,9 @@ export async function proxy(request) {
 
   if (payload) {
     if (isLoginPage) {
-      return NextResponse.redirect(new URL(homePathForRole(payload.role), request.url));
+      return NextResponse.redirect(
+        new URL(homePathForRole(payload.role), request.url),
+      );
     }
 
     // Forward the now cryptographically-verified identity to Server

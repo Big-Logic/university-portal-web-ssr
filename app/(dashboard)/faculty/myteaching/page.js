@@ -1,4 +1,4 @@
-import { getCurrentUser, apiRequest } from "@/lib/server-api";
+import { getCurrentUser } from "@/lib/server-api";
 import { assertRole } from "@/lib/navigation";
 import MyTeachingView from "./MyTeachingView";
 
