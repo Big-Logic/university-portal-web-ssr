@@ -1,5 +1,3 @@
-"use client";
-
 import styled from "styled-components";
 import { rt } from "@/lib/theme";
 
@@ -24,12 +22,8 @@ const Sub = styled.p`
   max-width: 640px;
 `;
 
-export default function PageIntro({ eyebrow, heading, sub }) {
-  return (
-    <div>
-      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Heading>{heading}</Heading>
-      {sub && <Sub>{sub}</Sub>}
-    </div>
-  );
-}
+export default {
+  Eyebrow,
+  Heading,
+  Sub,
+};

@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/server-api";
+import { getCurrentUser } from "@/lib/api/current-user";
 import DashboardShell from "@/components/DashboardShell";
 
 // Server Component, shared by every role-namespaced route (/admin,

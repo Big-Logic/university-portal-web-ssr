@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { forwardApiRequest } from "@/lib/server-api";
+import { serverRequest } from "@/lib/api/server";
 
 // Same-origin proxy for the admin "create user" form -- a Client
 // Component can't read the httpOnly access-token cookie itself, so it
@@ -7,7 +7,7 @@ import { forwardApiRequest } from "@/lib/server-api";
 // Bearer token server-side.
 export async function POST(request) {
   const body = await request.json().catch(() => null);
-  const { data, status } = await forwardApiRequest("/api/v1/users", {
+  const { data, status } = await serverRequest("/api/v1/users", {
     method: "POST",
     body,
   });

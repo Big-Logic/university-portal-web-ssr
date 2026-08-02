@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/session";
-import { verifyAccessToken } from "@/lib/jwt";
+import {
+  verifyAccessToken,
+  TOKEN_VALID,
+  TOKEN_INVALID,
+  TOKEN_EXPIRED,
+  TOKEN_MISSING,
+} from "@/lib/jwt";
 import { homePathForRole } from "@/lib/navigation";
 
 // Routes are namespaced by role at the top level rather than under a
@@ -29,9 +35,19 @@ export async function proxy(request) {
   const accessToken = request.cookies.get(ACCESS_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
 
-  const payload = await verifyAccessToken(accessToken);
+  const { status, payload } = await verifyAccessToken(accessToken);
 
-  if (payload) {
+  if (status === TOKEN_INVALID || !refreshToken) {
+    if (isLoginPage) {
+      return NextResponse.next();
+    }
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.delete(ACCESS_COOKIE);
+    response.cookies.delete(REFRESH_COOKIE);
+    return response;
+  }
+
+  if (status === TOKEN_VALID) {
     if (isLoginPage) {
       return NextResponse.redirect(
         new URL(homePathForRole(payload.role), request.url),
@@ -50,12 +66,16 @@ export async function proxy(request) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
+  // Expired -- the routine case, and the one refreshing is actually for.
   if (refreshToken) {
     const refreshUrl = new URL("/api/auth/refresh", request.url);
     refreshUrl.searchParams.set(
-      // Role isn't known yet here (the access token is missing/invalid,
-      // which is why we're refreshing) -- "/" does its own lightweight
-      // verify-and-redirect once the refresh sets a fresh cookie.
+      // `payload.role` is readable here even though the token expired
+      // (the signature verified before the expiry check did), but this
+      // still routes through "/" rather than jumping straight to the
+      // role home -- "/" re-verifies against the *fresh* cookie, which
+      // is the honest check. See lib/jwt.js on why expired claims are
+      // safe to read but not to authorize on.
       "returnTo",
       isLoginPage ? "/" : `${pathname}${search}`,
     );

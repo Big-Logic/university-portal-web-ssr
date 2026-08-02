@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { forwardApiRequest } from "@/lib/server-api";
+import { serverRequest } from "@/lib/api/server";
 
 // Express exposes deactivate/reactivate as two separate endpoints with
 // no body -- this collapses them into one { active } toggle for the
@@ -10,7 +10,7 @@ export async function PATCH(request, ctx) {
   const body = await request.json().catch(() => null);
   const action = body?.active ? "reactivate" : "deactivate";
 
-  const { data, status } = await forwardApiRequest(`/api/v1/users/${id}/${action}`, {
+  const { data, status } = await serverRequest(`/api/v1/users/${id}/${action}`, {
     method: "PATCH",
   });
 

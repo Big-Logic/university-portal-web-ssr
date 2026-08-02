@@ -1,10 +1,5 @@
-"use client";
-
-import { useState } from "react";
 import styled from "styled-components";
-import { Info, ChevronLeft, ChevronRight } from "lucide-react";
 import { rt } from "@/lib/theme";
-import { NOTICES } from "@/lib/sample-data";
 
 const Notice = styled.div`
   display: flex;
@@ -15,6 +10,11 @@ const Notice = styled.div`
   background: ${({ theme }) => rt(theme).color.blue100};
   border: 1px solid #cfdcf8;
   color: ${({ theme }) => rt(theme).color.blue700};
+`;
+
+const NoticeIcon = styled.span`
+  display: flex;
+  flex: none;
 `;
 
 const NoticeText = styled.div`
@@ -47,31 +47,10 @@ const NoticeBtn = styled.button`
   }
 `;
 
-export default function NoticeBanner() {
-  const [noticeIndex, setNoticeIndex] = useState(0);
-
-  return (
-    <Notice>
-      <Info size={17} aria-hidden="true" style={{ flex: "none" }} />
-      <NoticeText>{NOTICES[noticeIndex]}</NoticeText>
-      <NoticeNav>
-        <NoticeBtn
-          type="button"
-          aria-label="Previous notice"
-          onClick={() =>
-            setNoticeIndex((i) => (i + NOTICES.length - 1) % NOTICES.length)
-          }
-        >
-          <ChevronLeft size={15} aria-hidden="true" />
-        </NoticeBtn>
-        <NoticeBtn
-          type="button"
-          aria-label="Next notice"
-          onClick={() => setNoticeIndex((i) => (i + 1) % NOTICES.length)}
-        >
-          <ChevronRight size={15} aria-hidden="true" />
-        </NoticeBtn>
-      </NoticeNav>
-    </Notice>
-  );
-}
+export default {
+  Notice,
+  NoticeIcon,
+  NoticeText,
+  NoticeNav,
+  NoticeBtn,
+};

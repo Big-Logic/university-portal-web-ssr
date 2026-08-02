@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { rt } from "@/lib/theme";
 import { navForRole } from "@/lib/navigation";
 import { Badge } from "@/components/ui/primitives";
-import NoticeBanner from "@/components/dashboard/NoticeBanner";
+import NoticeBanner from "@/components/NoticeBanner";
 
 const Eyebrow = styled.p`
   font-family: ${({ theme }) => rt(theme).font.mono};
@@ -86,51 +86,14 @@ const NoticeWrap = styled.div`
   margin-bottom: ${({ theme }) => rt(theme).space[6]};
 `;
 
-/**
- * The shared "role home" layout: a greeting plus a card per module the
- * role has beyond Home itself. Only `user` (plain data) is passed in
- * from the Server Component page -- the module list (with its
- * lucide-react icon components) is derived from user.role here, on
- * the client, rather than built server-side and passed as a prop.
- */
-export default function ModuleHub({ user }) {
-  // const firstName = user.fullName?.split(" ")[0] || user.fullName;
-  const modules = navForRole(user.role).slice(1);
-
+export default function ModuleHub() {
   return (
     <div>
       <NoticeWrap>
         <NoticeBanner />
       </NoticeWrap>
       <Eyebrow>Dashboard</Eyebrow>
-      {/* <Heading>Welcome back, {firstName}.</Heading> */}
       <Heading>Welcome back.</Heading>
-      <Sub>
-        Signed in as <Badge $tone="accent">{user.role}</Badge>
-      </Sub>
-
-      {modules.length > 0 ? (
-        <Grid>
-          {modules.map((item) => {
-            const Icon = item.icon;
-            return (
-              <ModuleCard key={item.href} href={item.href}>
-                <IconBadge>
-                  <Icon size={18} aria-hidden="true" />
-                </IconBadge>
-                <ModuleLabel>{item.label}</ModuleLabel>
-                {item.description && (
-                  <ModuleDescription>{item.description}</ModuleDescription>
-                )}
-              </ModuleCard>
-            );
-          })}
-        </Grid>
-      ) : (
-        <EmptyNote>
-          No additional modules are assigned to your account yet.
-        </EmptyNote>
-      )}
     </div>
   );
 }

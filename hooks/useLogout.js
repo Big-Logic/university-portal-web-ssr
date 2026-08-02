@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { clientRequest } from "@/lib/client-api";
+import { clientRequest } from "@/lib/api/client";
 
 // Shared by every place that renders a "Log out" control (UserIdentity's
 // account menu, Sidebar's mobile one) -- each caller gets its own
