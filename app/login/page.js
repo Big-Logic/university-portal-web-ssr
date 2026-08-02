@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { GraduationCap } from "lucide-react";
 import { loginSchema } from "@/lib/validation";
 import { homePathForRole } from "@/lib/navigation";
-import { clientRequest } from "@/lib/client-api";
+import { clientRequest } from "@/lib/api/client";
 import Button from "@/components/ui/Button";
 import Field from "@/components/ui/Field";
 import { Alert } from "@/components/ui/primitives";

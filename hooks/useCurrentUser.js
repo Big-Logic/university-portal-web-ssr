@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { clientRequest } from "@/lib/client-api";
+import { clientRequest } from "@/lib/api/client";
 
 // Client-side fetch, deliberately -- every piece of chrome under this
 // shell needs the same identity data, and a shared queryKey means

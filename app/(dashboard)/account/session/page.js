@@ -1,4 +1,4 @@
-import { apiRequest } from "@/lib/server-api";
+import { apiRequest } from "@/lib/api/server";
 import SessionView from "./SessionView";
 
 // Deliberately uses apiRequest (a real, live round trip) instead of

@@ -51,7 +51,16 @@ export default function Sidebar({
 
         {menuOpen && (
           <S.SidebarMenuPanel>
-            <AccountMenuItems onNavigate={onCloseMenu} />
+            {/* Closes the drawer too, not just the menu -- this panel
+                only exists inside the mobile drawer, so navigating from
+                it should leave the destination page visible rather than
+                still covered by the off-canvas sidebar. */}
+            <AccountMenuItems
+              onNavigate={() => {
+                onCloseMenu();
+                onCloseDrawer();
+              }}
+            />
           </S.SidebarMenuPanel>
         )}
       </S.Footer>

@@ -21,14 +21,14 @@ primitives, form/validation conventions, animation, toasts).
 - **Data fetching for protected pages happens server-side.** Every
   page under the `(dashboard)` route group is a Server Component (no
   `"use client"`) that calls the Express API directly, server-to-server,
-  using `lib/server-api.js`. There is no client-side `authFetch`
+  using `lib/api/server.js`. There is no client-side `authFetch`
   equivalent for *page* data in this project -- if you're tempted to add
   one, that's a sign you're accidentally reintroducing Version A's
   pattern here.
   - **One deliberate exception:** the signed-in user's *full profile*
     (fullName/email/role, for display) is fetched client-side, via
     React Query (`useQuery` calling `GET /api/users/me`, a same-origin
-    Route Handler that proxies `forwardApiRequest` -- the browser
+    Route Handler that proxies `serverRequest` -- the browser
     still never touches the Express API directly). `UserIdentity` and
     `AccountMenuItems` (in `AccountMenuPanel.js`) each call this
     themselves through the shared `useCurrentUser` hook
@@ -55,6 +55,23 @@ primitives, form/validation conventions, animation, toasts).
   See the large comment at the top of that file for why it
   deliberately does more than Next's own "optimistic checks only"
   guidance recommends, and what the trade-off is.
+- **Reactive refresh (on a 401) lives in `lib/api/client.js`, not on
+  the server.** `clientRequest` retries once after refreshing;
+  `serverRequest` passes 401s straight through. This looks
+  backwards for a server-auth variant, so the reason matters: the API
+  rotates refresh tokens on every use with **no grace period**, so two
+  concurrent requests spending the same token means the second is
+  logged out. Deduping that needs one coordination point per session,
+  and the browser is the only place that exists -- a module-scoped
+  promise dedupes within a tab, and the Web Locks API
+  (`navigator.locks`) dedupes across tabs. A server-side equivalent
+  had to key its Map by the refresh token (module scope is shared by
+  every request a Node process serves, so a single shared promise
+  would hand one user's new token to another) and still only deduped
+  within one process, breaking under multi-instance or serverless
+  deployment. Note `/api/auth/*` is excluded from the retry -- a 401
+  from login means bad credentials, and retrying `/api/auth/refresh`
+  would recurse.
 - **The browser never calls the Express API directly.** Every call is
   same-origin (to this app's own Route Handlers) or server-to-server
   (Proxy, Server Components). This is also why `API_URL` in `.env.local`
@@ -77,9 +94,9 @@ own redirect-after-login logic.
 
 ```js
 // app/(dashboard)/{role}/something/page.js -- Server Component, no "use client"
-import { apiRequest } from "@/lib/server-api";
+import { apiRequest } from "@/lib/api/server";
 import { assertRole } from "@/lib/navigation";
-import { getCurrentUser } from "@/lib/server-api";
+import { getCurrentUser } from "@/lib/api/current-user";
 import SomethingView from "./SomethingView";
 
 export default async function SomethingPage() {
@@ -102,11 +119,19 @@ export default async function SomethingPage() {
 ```
 
 Don't try to add `"use client"` to a page that needs `apiRequest` or
-`getCurrentUser` -- both use `next/headers`, which only works in
-Server Components/Route Handlers/Proxy, not Client Components.
-`getCurrentUser()` specifically is for `/api/v1/users/me` only (it's
-cookie-first, see `lib/server-api.js`'s doc comment) -- every other
-endpoint goes through `apiRequest(path)`, a real network call every time.
+`getCurrentUser` -- both use `next/headers` (`cookies()` and
+`headers()` respectively), which only works in Server
+Components/Route Handlers/Proxy, not Client Components.
+
+The two are in separate files because they do fundamentally different
+things. `getCurrentUser()` (`lib/api/current-user.js`) makes **no
+network call at all** -- it reads back the `x-user-id`/`x-user-role`
+request headers Proxy already set after verifying the token's
+signature, so it only ever yields `{ id, role }`. Everything in
+`lib/api/server.js` (`apiRequest`, `serverRequest`) is a real HTTP
+round trip to Express. Anything needing the full profile
+(name/email) therefore goes through `apiRequest("/api/v1/users/me")`,
+not `getCurrentUser()`.
 
 ## Extending route protection to a new path
 

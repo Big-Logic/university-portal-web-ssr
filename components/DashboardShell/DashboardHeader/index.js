@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu } from "lucide-react";
-import HeaderActions from "@/components/dashboard/HeaderActions";
+import HeaderActions from "../HeaderActions";
 import Brand from "../Brand";
 import TimeDateCards from "../TimeDateCards";
 import UserIdentity from "../UserIdentity";
