@@ -3,14 +3,17 @@
 import { EllipsisVertical, User } from "lucide-react";
 import { Badge } from "@/components/ui/primitives";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { displayName } from "@/lib/user";
 import AccountMenuItems from "../AccountMenuPanel";
 import S, { KebabButton } from "./UserIdentity.style";
 
 export { KebabButton };
 
-// No real avatar image field exists on the API's /me response --
-// a generic person icon, not initials, on purpose (see conversation
-// history: initials implied a photo upload feature that doesn't exist).
+// The /me response does now carry an `avatarUrl`, but this still
+// renders a generic person icon -- showing real images is its own
+// change (loading and broken-URL states, sizing), not a side effect of
+// the field existing. Still not initials either, for the original
+// reason: they imply a photo-upload feature that doesn't exist.
 function IdentityRow({ user }) {
   return (
     <S.Row>
@@ -18,7 +21,7 @@ function IdentityRow({ user }) {
         <User size={17} aria-hidden="true" />
       </S.Avatar>
       <S.Text>
-        <S.Name>{user.fullName}</S.Name>
+        <S.Name>{displayName(user)}</S.Name>
         <Badge $tone="accent">{user.role}</Badge>
       </S.Text>
     </S.Row>

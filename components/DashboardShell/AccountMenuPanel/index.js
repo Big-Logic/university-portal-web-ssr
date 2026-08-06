@@ -3,6 +3,7 @@
 import { UserCircle, Settings, FileText, FileClock, LogOut } from "lucide-react";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useLogout from "@/hooks/useLogout";
+import { displayName } from "@/lib/user";
 import S, { AccountMenuPanel } from "./AccountMenuPanel.style";
 
 export { AccountMenuPanel };
@@ -20,7 +21,7 @@ export default function AccountMenuItems({ onNavigate }) {
   return (
     <>
       <S.Header>
-        <S.Name>{user.fullName}</S.Name>
+        <S.Name>{displayName(user)}</S.Name>
         <S.Email>{user.email}</S.Email>
       </S.Header>
       <S.Divider />
