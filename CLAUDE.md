@@ -26,7 +26,8 @@ primitives, form/validation conventions, animation, toasts).
   one, that's a sign you're accidentally reintroducing Version A's
   pattern here.
   - **One deliberate exception:** the signed-in user's *full profile*
-    (fullName/email/role, for display) is fetched client-side, via
+    (firstName/lastName/email/role and the rest of the profile
+    columns, for display) is fetched client-side, via
     React Query (`useQuery` calling `GET /api/users/me`, a same-origin
     Route Handler that proxies `serverRequest` -- the browser
     still never touches the Express API directly). `UserIdentity` and

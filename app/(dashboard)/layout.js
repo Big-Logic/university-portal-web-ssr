@@ -11,7 +11,7 @@ import DashboardShell from "@/components/DashboardShell";
 // no network call) is passed down too now, since Sidebar's nav needs
 // exactly that and nothing more. This is NOT the same fetch as
 // DashboardShell's client-side identity data (full profile --
-// fullName/email -- via React Query for the avatar/name/account
+// name parts, email -- via React Query for the avatar/name/account
 // menu): different data, different source, no race between them.
 export default async function DashboardLayout({ children }) {
   const user = await getCurrentUser();
