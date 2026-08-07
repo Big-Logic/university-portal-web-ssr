@@ -18,9 +18,13 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
+// The fallback every route inherits unless it exports its own. Keep it
+// describing the product, not any one page -- this used to say "Sign in
+// to your university portal", which was written when /login was the only
+// page and left every dashboard route describing a sign-in form.
 export const metadata = {
   title: "Basecourse — University Portal",
-  description: "Sign in to your university portal",
+  description: "Student record system for courses, enrollment, and grades.",
 };
 
 export default function RootLayout({ children }) {
