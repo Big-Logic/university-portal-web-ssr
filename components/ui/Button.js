@@ -73,6 +73,7 @@ export default function Button({
   block = false,
   loading = false,
   loadingText,
+  disabled = false,
   children,
   ...rest
 }) {
@@ -80,7 +81,10 @@ export default function Button({
     <StyledButton
       $variant={variant}
       $block={block}
-      disabled={loading || rest.disabled}
+      // Pulled out of `rest` deliberately: left in, the spread below
+      // would land after this and a caller passing `disabled={false}`
+      // would re-enable a button that's mid-request.
+      disabled={loading || disabled}
       whileTap={{ scale: 0.98 }}
       {...rest}
     >
