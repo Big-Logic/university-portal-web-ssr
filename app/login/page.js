@@ -1,6 +1,6 @@
-import LoginView from "./LoginView";
+import Login from "@/components/Login";
 
-// Server Component shell, same split as /forgot-password: a "use client"
+// Server Component shell, same split as /reset-password: a "use client"
 // page can't export `metadata`, since Next only reads it off a Server
 // Component.
 //
@@ -11,11 +11,14 @@ import LoginView from "./LoginView";
 // redirect an already-signed-in visitor: that would mean reading the
 // session cookie during render, and the cookie is only meaningful once
 // Proxy has verified it.
+//
+// No Suspense boundary, unlike /reset-password -- nothing under here
+// reads search params, so there's nothing to opt out of prerendering.
 export const metadata = {
   title: "Sign in — Basecourse",
   description: "Sign in to your Basecourse university portal.",
 };
 
 export default function LoginPage() {
-  return <LoginView />;
+  return <Login />;
 }
