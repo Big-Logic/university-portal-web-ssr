@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 
 // Styles shared across this folder: the pieces more than one of the
 // three panels uses. Anything only a single component renders lives in

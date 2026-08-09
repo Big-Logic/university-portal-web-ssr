@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 
 const tones = {
   danger: (t) => t.color.red600,

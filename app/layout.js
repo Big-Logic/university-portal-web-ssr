@@ -1,9 +1,9 @@
 import { Manrope, IBM_Plex_Mono } from "next/font/google";
 import { ThemeProvider } from "styled-components";
 import { Toaster } from "sonner";
-import StyledComponentsRegistry from "@/lib/registry";
-import GlobalStyles from "@/lib/globalStyles";
-import { theme } from "@/lib/theme";
+import StyledComponentsRegistry from "@/lib/style/registry";
+import GlobalStyles from "@/lib/style/globalStyles";
+import { theme } from "@/lib/style/theme";
 import QueryProvider from "@/providers/QueryProvider";
 
 const manrope = Manrope({

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 
 const Card = styled.div`
   background: ${({ theme }) => rt(theme).color.blue50};

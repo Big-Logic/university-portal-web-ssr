@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import { Card } from "@/components/ui/primitives";
 
 const Screen = styled.div`

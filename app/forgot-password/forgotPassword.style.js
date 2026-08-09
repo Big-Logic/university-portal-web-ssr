@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Link from "next/link";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import { Card } from "@/components/ui/primitives";
 
 // Single centred column rather than login's split screen: there's no

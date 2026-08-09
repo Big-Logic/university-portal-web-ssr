@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 
