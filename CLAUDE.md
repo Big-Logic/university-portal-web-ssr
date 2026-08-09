@@ -97,7 +97,7 @@ own redirect-after-login logic.
 // app/(dashboard)/{role}/something/page.js -- Server Component, no "use client"
 import { apiRequest } from "@/lib/api/server";
 import { assertRole } from "@/lib/navigation";
-import { getCurrentUser } from "@/lib/api/current-user";
+import { getCurrentUser } from "@/lib/auth/currentUser";
 import SomethingView from "./SomethingView";
 
 export default async function SomethingPage() {
@@ -124,8 +124,8 @@ Don't try to add `"use client"` to a page that needs `apiRequest` or
 `headers()` respectively), which only works in Server
 Components/Route Handlers/Proxy, not Client Components.
 
-The two are in separate files because they do fundamentally different
-things. `getCurrentUser()` (`lib/api/current-user.js`) makes **no
+The two live in separate folders because they do fundamentally
+different things. `getCurrentUser()` (`lib/auth/currentUser.js`) makes **no
 network call at all** -- it reads back the `x-user-id`/`x-user-role`
 request headers Proxy already set after verifying the token's
 signature, so it only ever yields `{ id, role }`. Everything in

@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/api/current-user";
+import { getCurrentUser } from "@/lib/auth/currentUser";
 import { assertRole } from "@/lib/navigation";
 import CoursesView from "./CoursesView";
 

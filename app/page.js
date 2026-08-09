@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ACCESS_COOKIE } from "@/lib/session";
-import { verifyAccessToken, TOKEN_VALID } from "@/lib/jwt";
+import { ACCESS_COOKIE } from "@/lib/auth/session";
+import { verifyAccessToken, TOKEN_VALID } from "@/lib/auth/jwt";
 import { homePathForRole } from "@/lib/navigation";
 
 // Server Component, no client-side redirect flash. Proxy's matcher
