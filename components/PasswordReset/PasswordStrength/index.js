@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { PASSWORD_RULES } from "@/lib/validation";
+import { PASSWORD_RULES } from "@/lib/validation/resetPassword";
 import S from "./PasswordStrength.style";
 
 // Ported from the design file. `met` counts satisfied rules; the length

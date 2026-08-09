@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { RESET_TOKEN_PATTERN } from "@/lib/validation";
+import { RESET_TOKEN_PATTERN } from "@/lib/validation/resetPassword";
 import { clientRequest } from "@/lib/api/client";
 import PageShell from "./PageShell";
 import ResetForm from "./ResetForm";

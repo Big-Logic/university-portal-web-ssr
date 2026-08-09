@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { GraduationCap, Mail } from "lucide-react";
-import { forgotPasswordSchema } from "@/lib/validation";
+import { forgotPasswordSchema } from "@/lib/validation/forgotPassword";
 import { clientRequest } from "@/lib/api/client";
 import Button from "@/components/ui/Button";
 import Field from "@/components/ui/Field";

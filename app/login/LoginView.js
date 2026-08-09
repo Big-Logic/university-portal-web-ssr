@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { GraduationCap } from "lucide-react";
-import { loginSchema } from "@/lib/validation";
+import { loginSchema } from "@/lib/validation/login";
 import { homePathForRole } from "@/lib/navigation";
 import { clientRequest } from "@/lib/api/client";
 import Button from "@/components/ui/Button";
