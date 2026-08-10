@@ -78,6 +78,20 @@ primitives, form/validation conventions, animation, toasts).
   (Proxy, Server Components). This is also why `API_URL` in `.env.local`
   is NOT prefixed `NEXT_PUBLIC_` -- it never needs to reach the client
   bundle, unlike the sibling project where it's unavoidable.
+  - **One deliberate exception, and it isn't the Express API:** profile
+    photo *bytes* go from the browser straight to Cloudinary
+    (`lib/api/avatar.js`). Uploading through our own server instead
+    would put every photo through a Route Handler's body limit for no
+    security gain, because the upload carries no standing credential:
+    `app/api/users/me/avatar/signature` mints a signature scoped to a
+    single `public_id`, and that id is derived from the verified
+    session (`avatars/user_<id>`), never from anything the browser
+    sends. Tamper with it and the signature no longer matches, so one
+    account cannot overwrite another's photo. `CLOUDINARY_API_SECRET`
+    stays on the server; the cloud name and API key ride back in the
+    signature response rather than the bundle, so the rule above still
+    holds for build-time config. The resulting URL is stored the
+    ordinary way -- `PATCH /api/users/me`, same-origin.
 
 ## Routes are namespaced by role, not by a shared `/dashboard` prefix
 
