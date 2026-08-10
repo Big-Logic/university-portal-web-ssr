@@ -1,4 +1,5 @@
-import ForgotPasswordView from "./ForgotPasswordView";
+import ForgotPassword from "@/components/Auth/ForgotPassword";
+import { APP_NAME } from "@/lib/branding";
 
 // The reason this route has a Server Component shell at all: a
 // "use client" page can't export `metadata` -- Next only reads it off a
@@ -11,11 +12,10 @@ import ForgotPasswordView from "./ForgotPasswordView";
 // stay reachable signed-out) and its only input is the address the user
 // types, so this is a shell rather than a data loader.
 export const metadata = {
-  title: "Reset your password — Basecourse",
-  description:
-    "Request a link to set a new password on your Basecourse account.",
+  title: "Reset your password",
+  description: `Request a link to set a new password on your ${APP_NAME} account.`,
 };
 
 export default function ForgotPasswordPage() {
-  return <ForgotPasswordView />;
+  return <ForgotPassword />;
 }

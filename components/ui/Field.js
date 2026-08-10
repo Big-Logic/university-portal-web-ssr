@@ -1,7 +1,7 @@
 "use client";
 
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import { forwardRef, useId, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 

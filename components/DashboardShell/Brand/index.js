@@ -1,6 +1,7 @@
 "use client";
 
 import { GraduationCap } from "lucide-react";
+import { APP_NAME } from "@/lib/branding";
 import S from "./Brand.style";
 
 export default function Brand() {
@@ -9,7 +10,7 @@ export default function Brand() {
       <S.Mark>
         <GraduationCap size={18} aria-hidden="true" />
       </S.Mark>
-      <S.Name>Basecourse</S.Name>
+      <S.Name>{APP_NAME}</S.Name>
     </>
   );
 }

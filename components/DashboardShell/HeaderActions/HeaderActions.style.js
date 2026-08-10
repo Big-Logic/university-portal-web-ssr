@@ -1,5 +1,5 @@
 import styled, { keyframes } from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import { BREAKPOINT } from "../constants";
 
 const Wrap = styled.div`

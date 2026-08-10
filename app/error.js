@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import Button from "@/components/ui/Button";
 import { AlertTriangle } from "lucide-react";
 

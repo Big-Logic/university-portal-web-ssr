@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/session";
+import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/auth/session";
 import {
   verifyAccessToken,
   TOKEN_VALID,
   TOKEN_INVALID,
   TOKEN_EXPIRED,
   TOKEN_MISSING,
-} from "@/lib/jwt";
+} from "@/lib/auth/jwt";
 import { homePathForRole } from "@/lib/navigation";
 
 // Routes are namespaced by role at the top level rather than under a

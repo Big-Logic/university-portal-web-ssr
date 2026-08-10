@@ -1,6 +1,6 @@
 import Link from "next/link";
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 
 // Unpositioned base panel -- each caller (header kebab, mobile sidebar
 // kebab) extends this with its own `position`/anchor offsets, since

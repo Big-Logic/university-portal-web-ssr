@@ -6,7 +6,7 @@ import {
   COOKIE_OPTIONS,
   ACCESS_MAX_AGE,
   REFRESH_MAX_AGE,
-} from "@/lib/session";
+} from "@/lib/auth/session";
 
 const API_URL = process.env.API_URL;
 

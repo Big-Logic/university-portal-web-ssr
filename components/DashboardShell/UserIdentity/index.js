@@ -3,7 +3,7 @@
 import { EllipsisVertical, User } from "lucide-react";
 import { Badge } from "@/components/ui/primitives";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { displayName } from "@/lib/user";
+import { displayName } from "@/utils/user";
 import AccountMenuItems from "../AccountMenuPanel";
 import S, { KebabButton } from "./UserIdentity.style";
 

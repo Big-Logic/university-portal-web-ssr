@@ -1,7 +1,7 @@
 "use client";
 
 import styled, { css, keyframes } from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import { motion } from "framer-motion";
 
 const spin = keyframes`

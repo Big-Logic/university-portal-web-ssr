@@ -3,7 +3,7 @@
 import { UserCircle, Settings, FileText, FileClock, LogOut } from "lucide-react";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useLogout from "@/hooks/useLogout";
-import { displayName } from "@/lib/user";
+import { displayName } from "@/utils/user";
 import S, { AccountMenuPanel } from "./AccountMenuPanel.style";
 
 export { AccountMenuPanel };
