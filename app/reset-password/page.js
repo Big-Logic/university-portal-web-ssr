@@ -1,9 +1,10 @@
 import { Suspense } from "react";
-import PasswordReset from "@/components/PasswordReset";
+import PasswordReset from "@/components/Auth/PasswordReset";
+import { APP_NAME } from "@/lib/branding";
 
 export const metadata = {
-  title: "Set a new password — Basecourse",
-  description: "Finish resetting the password on your Basecourse account.",
+  title: "Set a new password",
+  description: `Finish resetting the password on your ${APP_NAME} account.`,
 };
 
 // The Suspense boundary is load-bearing, not decoration: PasswordReset

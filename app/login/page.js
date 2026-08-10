@@ -1,4 +1,5 @@
-import Login from "@/components/Login";
+import Login from "@/components/Auth/Login";
+import { APP_NAME } from "@/lib/branding";
 
 // Server Component shell, same split as /reset-password: a "use client"
 // page can't export `metadata`, since Next only reads it off a Server
@@ -14,9 +15,11 @@ import Login from "@/components/Login";
 //
 // No Suspense boundary, unlike /reset-password -- nothing under here
 // reads search params, so there's nothing to opt out of prerendering.
+// Title is the page's half only -- the root layout's template appends
+// the product name.
 export const metadata = {
-  title: "Sign in — Basecourse",
-  description: "Sign in to your Basecourse university portal.",
+  title: "Sign in",
+  description: `Sign in to your ${APP_NAME} university portal.`,
 };
 
 export default function LoginPage() {
