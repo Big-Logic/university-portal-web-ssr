@@ -1,6 +1,6 @@
 import Link from "next/link";
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import { AccountMenuPanel } from "../AccountMenuPanel";
 import { BREAKPOINT } from "../constants";
 

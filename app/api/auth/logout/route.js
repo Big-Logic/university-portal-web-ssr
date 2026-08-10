@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/session";
+import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/auth/session";
 
 const API_URL = process.env.API_URL;
 

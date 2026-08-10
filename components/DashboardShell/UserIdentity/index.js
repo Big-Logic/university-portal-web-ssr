@@ -3,22 +3,34 @@
 import { EllipsisVertical, User } from "lucide-react";
 import { Badge } from "@/components/ui/primitives";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { displayName } from "@/utils/user";
+import { avatarSrc } from "@/utils/avatar";
 import AccountMenuItems from "../AccountMenuPanel";
 import S, { KebabButton } from "./UserIdentity.style";
 
 export { KebabButton };
 
-// No real avatar image field exists on the API's /me response --
-// a generic person icon, not initials, on purpose (see conversation
-// history: initials implied a photo upload feature that doesn't exist).
+// The photo when there is one, the generic person icon when there
+// isn't -- the same pair the profile card shows, one size down, so the
+// chip and the card can't present someone two different ways.
+//
+// Requested through avatarSrc at the size this chip actually draws:
+// the stored URL is the untransformed original, and asking a 34px
+// circle to download a 4MB photo would be the whole point of using
+// Cloudinary, wasted.
+//
+// Decorative in both branches -- the name is right beside it, so
+// there's nothing here for a screen reader to add.
+const AVATAR_SIZE = 34;
+
 function IdentityRow({ user }) {
   return (
     <S.Row>
-      <S.Avatar>
-        <User size={17} aria-hidden="true" />
+      <S.Avatar $src={avatarSrc(user.avatarUrl, AVATAR_SIZE)} aria-hidden="true">
+        {!user.avatarUrl && <User size={17} />}
       </S.Avatar>
       <S.Text>
-        <S.Name>{user.fullName}</S.Name>
+        <S.Name>{displayName(user)}</S.Name>
         <Badge $tone="accent">{user.role}</Badge>
       </S.Text>
     </S.Row>

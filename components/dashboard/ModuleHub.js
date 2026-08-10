@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import styled from "styled-components";
-import { rt } from "@/lib/theme";
+import { rt } from "@/lib/style/theme";
 import { navForRole } from "@/lib/navigation";
 import { Badge } from "@/components/ui/primitives";
 import NoticeBanner from "@/components/NoticeBanner";
