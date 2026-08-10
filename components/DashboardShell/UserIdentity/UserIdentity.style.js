@@ -9,16 +9,24 @@ const Row = styled.div`
   gap: 8px;
 `;
 
+// The photo when there is one, the person icon when there isn't -- the
+// same pair the profile card shows, one size down. The blue fill stays
+// underneath either way, so a photo that's still loading (or 404s)
+// leaves a filled circle rather than a hole in the chip.
 const Avatar = styled.div`
   width: 34px;
   height: 34px;
   flex: none;
   border-radius: ${({ theme }) => rt(theme).radius.pill};
   background: ${({ theme }) => rt(theme).color.blue100};
+  background-image: ${({ $src }) => ($src ? `url(${JSON.stringify($src)})` : "none")};
+  background-size: cover;
+  background-position: center;
   color: ${({ theme }) => rt(theme).color.blue700};
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 `;
 
 const Text = styled.div`

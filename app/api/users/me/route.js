@@ -13,3 +13,23 @@ export async function GET() {
   const { data, status } = await serverRequest("/api/v1/users/me");
   return NextResponse.json(data, { status });
 }
+
+// Self-service profile edit, from the form on /account/profile. Which
+// account gets edited is decided by the token, not the body, so there
+// is no id to check here and nobody else to reach.
+//
+// The body is forwarded as-is: the API validates it again (and owns
+// the real rules), so re-checking here would only duplicate a schema
+// that could drift. A validation failure comes back as Express's
+// { error: { code, message } }, which clientRequest surfaces to the
+// form.
+export async function PATCH(request) {
+  const body = await request.json().catch(() => null);
+
+  const { data, status } = await serverRequest("/api/v1/users/me", {
+    method: "PATCH",
+    body,
+  });
+
+  return NextResponse.json(data, { status });
+}
